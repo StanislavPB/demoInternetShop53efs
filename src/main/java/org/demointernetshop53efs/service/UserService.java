@@ -9,6 +9,7 @@ import org.demointernetshop53efs.entity.User;
 import org.demointernetshop53efs.repository.UserRepository;
 import org.demointernetshop53efs.service.exception.AlreadyExistException;
 import org.demointernetshop53efs.service.exception.NotFoundException;
+import org.springframework.context.annotation.Profile;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;

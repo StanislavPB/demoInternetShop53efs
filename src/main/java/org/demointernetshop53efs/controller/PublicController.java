@@ -18,7 +18,6 @@ public class PublicController implements PublicApi {
 
     @Override
     public ResponseEntity<UserResponseDto> userRegistration(UserRequestDto request) {
-        System.out.println("ПОПАЛИ В КОНТРОЛЛЕР!!!");
         return ResponseEntity
                 .status(HttpStatus.CREATED)
                 .body(userService.registration(request));
