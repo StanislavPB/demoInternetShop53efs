@@ -1,10 +1,12 @@
 package org.demointernetshop53efs.controller;
 
+import org.demointernetshop53efs.dto.UserRequestDto;
 import org.demointernetshop53efs.entity.ConfirmationCode;
 import org.demointernetshop53efs.entity.User;
 import org.demointernetshop53efs.repository.ConfirmationCodeRepository;
 import org.demointernetshop53efs.repository.UserRepository;
 import org.demointernetshop53efs.service.UserService;
+import org.demointernetshop53efs.service.exception.AlreadyExistException;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -20,6 +22,7 @@ import org.springframework.test.web.servlet.MockMvc;
 
 import java.time.LocalDateTime;
 
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -29,7 +32,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
 @ActiveProfiles("test")
 @TestPropertySource(locations = "classpath:application-test.yml")
-public class SecurityTest {
+public class UserServiceTest {
 
     @Autowired
     private MockMvc mockMvc;
@@ -37,7 +40,8 @@ public class SecurityTest {
     private UserRepository userRepository;
     @Autowired
     private ConfirmationCodeRepository confirmationCodeRepository;
-
+    @Autowired
+    private UserService userService;
 
     @BeforeEach
     void setUp(){
@@ -64,44 +68,17 @@ public class SecurityTest {
     }
 
     @Test
-    public void testWhenNoAuthenticationThenReturn403Users() throws Exception {
-        String requestPath = "/api/users";
-        mockMvc.perform(get(requestPath)
-                .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isForbidden());
+    void testWhenDuplicatedEmail(){
+        UserRequestDto requestDto = new UserRequestDto(
+                "firstUserName",
+                "lastUserName",
+                "user1@gmail.com",
+                "Pass12345!"
+        );
+
+        assertThrows(AlreadyExistException.class, () -> userService.registration(requestDto));
 
     }
-
-    @Test
-    public void testWhenNoAuthenticationThenReturn403Admins() throws Exception {
-        String requestPath = "/api/admins/users";
-        mockMvc.perform(get(requestPath)
-                        .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isForbidden());
-
-    }
-
-
-    @Test
-    @WithMockUser(username = "user",roles = {"USER"})
-    public void testWhenNoAuthorizeRoleThenReturn403Admins() throws Exception {
-        String requestPath = "/api/admins/users";
-        mockMvc.perform(get(requestPath)
-                        .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isForbidden());
-
-    }
-
-    @Test
-    @WithMockUser(username = "admin",roles = {"ADMIN"})
-    public void testWhenReturn200ForAdminRequest() throws Exception {
-        String requestPath = "/api/admins/users";
-        mockMvc.perform(get(requestPath)
-                        .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isOk());
-
-    }
-
 
 
 
